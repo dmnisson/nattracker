@@ -1,0 +1,19 @@
+<h1>Negative Automatic Thought Tracker</h1>
+
+<h2>Welcome, {{ user.username }}!</h2>
+
+<h3>Your most recent situations</h3>
+
+{% if latest_situations_list %}
+<ul>
+{% for situation in latest_situations_list %}
+    <li><a href="{% url 'detail' situation.id %}">{{ situation.situation_text }}</a></li>
+{% endfor %}
+</ul>
+{% else %}
+<p>No situations have been added.</p>
+{% endif %}
+
+<hr />
+
+<a href="{% url 'logout' %}">Log Out</a>
