@@ -23,8 +23,7 @@ class ProfileView(LoginRequiredMixin, ListView):
     context_object_name = 'latest_situations_list'
 
     def get_queryset(self):
-        #return Situation.objects.filter(user=self.request.user).filter(add_date__lte=timezone.now()).order_by('-add_date')[:5]
-        return Situation.objects.order_by('-add_date')[:5]
+        return Situation.objects.filter(user=self.request.user).filter(add_date__lte=timezone.now()).order_by('-add_date')[:5]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
