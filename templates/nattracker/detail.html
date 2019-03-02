@@ -1,6 +1,13 @@
-<h1>Negative Automatic Thought Tracker</h1>
+{% extends "./user_base.html" %}
 
-<h2>Situation</h2>
-<p>Added {{object.add_date}}</p>
+{% block title %}Situation details -- {{ user.username }} -- nattracker{% endblock %}
 
-<p>{{ object.situation_text }}</p>
+{% block heading %}Situation{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10">
+        <p class="text-muted">Added {{object.add_date}}</p>
+        <p>{{ object.situation_text }}</p>
+    </div>
+</div>

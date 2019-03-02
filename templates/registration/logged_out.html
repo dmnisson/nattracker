@@ -1,5 +1,15 @@
-<h1>Negative Automatic Thought Tracker</h1>
+{% extends "../base.html" %}
 
-<p>You are successfully logged out.</p>
+{% block content %}
+<div class="row">
+    <div class="col-lg-10">
+        <p class="lead">You are successfully logged out.</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-10">
+        <a class="btn btn-primary" href="{% url 'index' %}">Return to Home</a>
+    </div>
+</div>
 
-<a href="{% url 'index' %}">Return to Home</a>
+{% endblock %}

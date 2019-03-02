@@ -1,5 +1,10 @@
-<h1>Negative Automatic Thought Tracker</h1>
+{% extends "../base.html" %}
 
+{% block title %}Log in to nattracker{% endblock %}
+
+{% block heading %}Log in{% endblock %}
+
+{% block content %}
 {% if form.errors %}
 <p>Invalid username or password. Please try again.</p>
 {% endif %}
@@ -10,17 +15,18 @@
 
 <form method="post" action="{% url 'login' %}">
 {% csrf_token %}
-<table>
+<table class="table">
     <tr>
-        <td>{{ form.username.label_tag }}</td>
+        <th>{{ form.username.label_tag }}</th>
         <td>{{ form.username }}</td>
     </tr>
     <tr>
-        <td>{{ form.password.label_tag }}</td>
+        <th>{{ form.password.label_tag }}</th>
         <td>{{ form.password }}</td>
     </tr>
 </table>
 
-<input type="submit" value="Log In" />
+<input class="btn btn-primary" type="submit" value="Log In" />
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
+{% endblock %}

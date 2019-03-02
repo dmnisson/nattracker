@@ -1,5 +1,13 @@
+{% extends "./user_base.html" %}
+
+{% block title %}Editing Situation -- {{ user.username }} -- nattracker{% endblock %}
+
+{% block heading %}Update Situation{% endblock %}
+
+{% block content %}
 <form action="{{ action_url }}" method="POST">
     {% csrf_token %}
     {{ form }}
     <input type="submit" value="Submit">
 </form>
+{% endblock %}

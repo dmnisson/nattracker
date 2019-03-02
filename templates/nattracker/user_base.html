@@ -1,0 +1,13 @@
+{% extends "../base.html" %}
+
+{% block navitems %}
+<li class="nav-item {% if request.resolver_match.url_name == "profile" %}active{% endif %}">
+    <a class="nav-link" href="{% url 'profile' %}">Dashboard</a>
+</li>
+<li class="nav-item {% if request.resolver_match.url_name == "statistics" %}active{% endif %}">
+    <a class="nav-link" href="{% url 'statistics' %}">Statistics</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+</li>
+{% endblock %}

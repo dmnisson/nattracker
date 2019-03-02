@@ -1,10 +1,21 @@
+{% extends "./user_base.html" %}
+
 {% load statistics_extras %}
 
-<h2>Your Statistics</h2>
+{% block title %}Statistics -- {{ user.username }} -- nattracker{% endblock %}
 
-<h3>Most frequent negative thoughts</h3>
+{% block heading %}Your Statistics{% endblock %}
 
-<table>
+{% block content %}
+<div class="row">
+    <div class="col-lg-10">
+        <h2>Most frequent negative thoughts</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-10">
+<table class="table">
     <tr>
         <th>Thought</th> <th>Frequency</th> <th>Most Frequent Emotion</th>    <th>Most Frequent Response</th>
     </tr>
@@ -23,17 +34,23 @@
     </tr>
     {% endif %}
 </table>
-
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-10">
 <h3>Most effective positive challenges</h3>
-
-<table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-10">
+<table class="table">
     <tr>
         <th>Negative Thought</th>    <th>Negative Emotion</th>    <th>Positive Challenge</th> <th>Efficacy</th>
     </tr>
     {% if most_effective_positive_challenges_list %}
     {% for thought in most_effective_positive_challenges_list %}
     <tr>
-        <td>{{ thought %}</td>
+        <td>{{ thought }}</td>
         <td>{{ thought_emotion_dict|get_item:thought }}</td>
         <td>{{ thought_challenge_dict|get_item:thought }}</td>
         <td>{{ thought_challenge_eff_dict|get_item:thought }}</td>
@@ -45,3 +62,6 @@
     </tr>
     {% endif %}
 </table>
+    </div>
+</div>
+{% endblock %}
