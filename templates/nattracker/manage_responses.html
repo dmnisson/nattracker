@@ -1,0 +1,80 @@
+{% extends "./user_base.html" %}
+
+{% block title %}Response Manager -- {{ user.username }} -- nattracker{% endblock %}
+
+{% block heading %}Manage Responses{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col">
+        <div class="table-responsive-md">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Response</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for response in responses %}
+                    <tr>
+                        <td>{{ response.response_name }}</td>
+                        <td>
+                            <div class="btn-group" role="group" aria-label="Response management actions">
+                                <a class="btn btn-primary" href="#">Details</a>
+                                <a class="btn btn-primary" href="#">Edit</a>
+                                <a class="btn btn-primary" href="#">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <a class="btn btn-primary" href="{% url 'add_response' %}">Add New</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <nav aria-label="Response list pagination">
+            <ul class="pagination">
+                {% if responses.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ responses.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for n in view_page_range %}
+                {% if n == responses.number %}
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link" href="?page={{ n }}">{{ n }} <span class="sr-only">(current)</span></a>
+                </li>
+                {% elif n == "..." %}
+                <li class="page-item">
+                    ...
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ n }}">{{ n }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if responses.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ responses.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}

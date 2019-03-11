@@ -1,0 +1,216 @@
+{% extends "./user_base.html" %}
+
+{% load widget_tweaks statistics_extras %}
+
+{% block title %}
+{% if response.name|length == 0 %}
+New Response
+{% else %}
+Editing Response "{{ response.name }}"
+{% endif %}
+ -- {{ user.username }} -- nattracker
+{% endblock %}
+
+{% block heading %}
+{% if response %}
+Update
+{% else %}
+Add New
+{% endif %} Response
+{% endblock %}
+
+{% block content %}
+<form method="POST" action="{{ action_url }}">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-warning">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    {% for hidden_field in form.hidden_fields %}
+        {% if hidden_field.errors %}
+            <div class="alert alert-warning">
+                {{ hidden_field.errors }}
+            </div>
+        {% endif %}
+        {{ hidden_field }}
+    {% endfor %}
+
+    <div class="m-0 p-0">
+        <div class="form-row">
+            <div class="form-group col-lg-12">
+                {{ form.response_name.label_tag }}
+                {% if form.response_name.errors %}
+                <div class="form-text text-danger">
+                    {{ form.response_name.errors }}
+                </div>
+                {% endif %}
+                {% render_field form.response_name class=form.response_name|field_css_class placeholder=form.response_name.label %}
+                <small id="{{ form.response_name.name }}HelpBlock" class="form-text text-muted">
+                    {{ form.response_name.help_text }}
+                </small>
+            </div>
+        </div>
+        {% for thought_fields in form.get_thought_text_and_check_fields %}
+        <div class="form-row align-items-center" id="{{ thought_fields.0.name }}_form_row">
+            <div class="form-group col-md-8">
+                {{ thought_fields.0.label_tag }}
+                {% if thought_fields.0.errors %}
+                <div class="form-text text-danger">
+                    {{ thought_fields.0.errors }}
+                </div>
+                {% endif %}
+                {% render_field thought_fields.0 class=thought_fields.0|field_css_class placeholder=thought_fields.0.label %}
+                <small id="{{ thought_fields.0.name }}HelpBlock" class="form-text text-muted">
+                    {{ thought_fields.0.help_text }}
+                </small>
+            </div>
+            <div class="form-group col-md-4">
+                <div class="form-check">
+                    {% if thought_fields.1.errors %}
+                    <div class="form-text text-danger">
+                        {{ thought_fields.1.errors }}
+                    </div>
+                    {% endif %}
+                    {% render_field thought_fields.1 class=thought_fields.1|field_css_class %}
+                    <label class="form-check-label" for="{{  thought_fields.1.name }}">{{  thought_fields.1.label }}</label>
+                    <small id="{{  thought_fields.1.name }}HelpBlock" class="form-text text-muted">
+                        {{  thought_fields.1.help_text }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="form-row">
+        <div class="col-md-3">
+            <button type="button" class="btn btn-primary" id="addMoreThoughtsButton">Add More Thoughts</button>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-8">
+            {{ form.emotions.label_tag }}
+            {% if form.emotions.errors %}
+            <div class="form-text text-danger">
+                {{ form.emotions.errors }}
+            </div>
+            {% endif %}
+            {% render_field form.emotions class=form.emotions|field_css_class size=5 placeholder=form.emotions.label %}
+            <small id="{{ form.emotions.name }}HelpBlock" class="form-text text-muted">
+                {{ form.emotions.help_text }}
+            </small>
+            <input type="text" id="newEmotionField" />
+            <button type="button" class="btn btn-primary" id="newEmotionButton" disabled>Add New</button>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-8">
+            {{ form.behaviors.label_tag }}
+            {% if form.behaviors.errors %}
+            <div class="form-text text-danger">
+                {{ form.behaviors.errors }}
+            </div>
+            {% endif %}
+            {% render_field form.behaviors class=form.behaviors|field_css_class size=5 placeholder=form.behaviors.label %}
+            <small id="{{ form.behaviors.name }}HelpBlock" class="form-text text-muted">
+                {{ form.behaviors.help_text }}
+            </small>
+            <input type="text" id="newBehaviorField" />
+            <button type="button" class="btn btn-primary my-auto" id="newBehaviorButton" disabled>Add New</button>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success my-2">Save</button>
+</form>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+// generate new form elements for each new thought added
+$('#addMoreThoughtsButton').click(function () {
+    var divIDs = $('div').filter(function() {return this.id.match(/thought_text_\d+_form_row/);})
+        .map(function() {return this.id;}).get();
+    divIDs.sort();
+
+    $last_form_row = $('#' + divIDs[divIDs.length - 1]);
+    $form_row_clone = $last_form_row.clone();
+
+    let form_row_id = $form_row_clone.attr('id');
+    let n = parseInt(form_row_id.split('_')[2]);
+
+    let thought_text_name = 'thought_text_' + n;
+    let thought_is_nat_name = 'thought_is_nat_' + n;
+
+    // find clone controls by name attribute
+    let $thought_text_clone = $form_row_clone.find("[name='" + thought_text_name + "']");
+    let $thought_is_nat_clone = $form_row_clone.find("[name='" + thought_is_nat_name + "']");
+
+    // increment n and change field names and form row id accordingly
+    n = n + 1;
+    form_row_id = 'thought_text_' + n + '_form_row';
+    thought_text_name = 'thought_text_' + n;
+    thought_is_nat_name = 'thought_is_nat_' + n;
+
+    $form_row_clone.attr('id', form_row_id);
+    $thought_text_clone.val('');
+    $thought_text_clone.attr('name', thought_text_name);
+    $thought_is_nat_clone.attr('name', thought_is_nat_name);
+
+    $form_row_clone.appendTo($last_form_row.parent());
+});
+
+// function for adding new string values to multiple select boxes
+function addOptionTo(value, option_string, select_name) {
+    let $select_element = $(`[name='${select_name}']`);
+
+    $select_element.append(`<option value="${value}" selected>${option_string}</option>`)
+}
+
+// set up CSRF protection
+(function() {
+    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+})();
+
+// ties a button to validity of an input field
+function validate_box(string_field, button_to_enable) {
+    button_to_enable.prop('disabled', string_field.val() == null || string_field.val().trim() == '');
+}
+
+// add new emotion and auto select
+$('#newEmotionField').on('input', function() {
+    validate_box($(this), $('#newEmotionButton'));
+})
+
+$('#newEmotionButton').click(function() {
+    $.post("{% url 'add_emotion' %}", $('#newEmotionField').val(), function(data) {
+        addOptionTo(data.id, $('#newEmotionField').val(), "{{ form.emotions.name }}");
+    })
+});
+
+// add new behavior and auto select
+$('#newBehaviorField').on('input', function() {
+    validate_box($(this), $('#newBehaviorButton'));
+})
+
+$('#newBehaviorButton').click(function() {
+    $.post("{% url 'add_behavior' %}", $('#newBehaviorField').val(), function(data) {
+        addOptionTo(data.id, $('#newBehaviorField').val(), "{{ form.behaviors.name }}");
+    })
+});
+</script>
+{% endblock %}

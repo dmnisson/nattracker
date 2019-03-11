@@ -1,38 +1,62 @@
 {% extends "./user_base.html" %}
 
+{% load statistics_extras %}
+
 {% block title %}{{ user.username }}'s profile -- nattracker{% endblock %}
 
 {% block heading %}Welcome, {{ user.username }}!{% endblock %}
 
 {% block content %}
 <div class="row">
-    <div class="col-lg-10">
-        <h3>Your most recent situations</h3>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h3>Your most recent situations</h3>
+
+                {% if latest_situations_list %}
+                <table class="table">
+                    <tr>
+                        <th>Situation</th>
+                        <th>Added</th>
+                    </tr>
+                    {% for situation in latest_situations_list %}
+                    <tr>
+                        <td><a href="{% url 'detail' situation.id %}">{{ situation.situation_text }}</a></td>
+                        <td>{{ situation.add_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}
+                <p class="card-text">No situations have been added.</p>
+                {% endif %}
+                <a class="btn btn-primary" href="{% url 'add_situation' %}">Add New Situation</a>
+            </div>
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-lg-10">
-        {% if latest_situations_list %}
-        <table class="table">
-            <tr>
-                <th>Situation</th>
-                <th>Added</th>
-            </tr>
-            {% for situation in latest_situations_list %}
-            <tr>
-                <td><a href="{% url 'detail' situation.id %}">{{ situation.situation_text }}</a></td>
-                <td>{{ situation.add_date }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        {% else %}
-        <p>No situations have been added.</p>
-        {% endif %}
-    </div>
-</div>
-<div class="row">
-    <div class="col-lg-10">
-        <a class="btn btn-primary" href="{% url 'add_situation' %}">Add New Situation</a>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h3>Your most recent responses</h3>
+
+                {% if latest_responses_list %}
+                <table class="table">
+                    <tr>
+                        <th>Response</th>
+                        <th>Latest occurrence</th>
+                    </tr>
+                    {% for response in latest_responses_list %}
+                    <tr>
+                        <td><a href="#">{{ response.response_name }}</a></td>
+                        <td>{{ response_latest_occur_dict|get_item:response }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}
+                <p class="card-text">No responses have been added.</p>
+                {% endif %}
+                <a class="btn btn-primary" href="{% url 'manage_responses' %}">Manage responses</a>
+            </div>
+        </div>
     </div>
 </div>
 

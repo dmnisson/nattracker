@@ -19,7 +19,7 @@
     <tr>
         <th>Thought</th> <th>Frequency</th> <th>Most Frequent Emotion</th>    <th>Most Frequent Response</th>
     </tr>
-    {% if most_frequent_negative_thoughts_list %}
+    {% if most_frequent_negative_thoughts_list|length > 0 %}
     {% for thought in most_frequent_negative_thoughts_list %}
     <tr>
         <td>{{ thought }}</td>
@@ -29,8 +29,10 @@
     </tr>
     {% endfor %}
     {% else %}
-    <tr colspan="4">
-        No negative thoughts to show.
+    <tr>
+        <td colspan="4">
+            No negative thoughts to show.
+        </td>
     </tr>
     {% endif %}
 </table>
@@ -47,7 +49,7 @@
     <tr>
         <th>Negative Thought</th>    <th>Negative Emotion</th>    <th>Positive Challenge</th> <th>Efficacy</th>
     </tr>
-    {% if most_effective_positive_challenges_list %}
+    {% if most_effective_positive_challenges_list|length > 0 %}
     {% for thought in most_effective_positive_challenges_list %}
     <tr>
         <td>{{ thought }}</td>
@@ -57,8 +59,10 @@
     </tr>
     {% endfor %}
     {% else %}
-    <tr colspan="4">
-        No negative thoughts to show with effective positive challenges.
+    <tr>
+        <td colspan="4">
+            No negative thoughts to show with effective positive challenges.
+        </td>
     </tr>
     {% endif %}
 </table>

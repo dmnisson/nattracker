@@ -1,4 +1,5 @@
 {% extends "./user_base.html" %}
+{% load widget_tweaks statistics_extras %}
 
 {% block title %}Editing Situation -- {{ user.username }} -- nattracker{% endblock %}
 
@@ -7,7 +8,41 @@
 {% block content %}
 <form action="{{ action_url }}" method="POST">
     {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit">
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-warning">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    {% for hidden_field in form.hidden_fields %}
+        {% if hidden_field.errors %}
+            <div class="alert alert-warning">
+                {{ hidden_field.errors }}
+            </div>
+        {% endif %}
+        {{ hidden_field }}
+    {% endfor %}
+
+    {% for field in form.visible_fields %}
+    <div class="form-group">
+        {{ field.label_tag }}
+        {% if field.errors %}
+        <div class="invalid-feedback">
+            {{ field.errors }}
+        </div>
+        {% endif %}
+        {% render_field field class=field|field_css_class placeholder=field.label %}
+        <small id="{{ field.name }}HelpBlock" class="form-text text-muted">
+            {{ field.help_text }}
+        </small>
+    </div>
+    {% endfor %}
+
+    <div>
+        <a class="btn btn-primary my-2" href="{% url 'add_response' %}">Add new response</a>
+    </div>
+
+    <button type="submit" class="btn btn-success my-2">Save</button>
 </form>
 {% endblock %}

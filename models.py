@@ -35,7 +35,7 @@ class Response(models.Model):
 
 class Situation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    situation_text = models.CharField(max_length=200)
+    situation_text = models.CharField(max_length=255)
     add_date = models.DateTimeField('date added')
     unhelpful_response = models.ForeignKey(Response, on_delete=models.SET_NULL, related_name='unhelpful_in_situations', null=True)
     helpful_response = models.ForeignKey(Response, on_delete=models.SET_NULL, related_name='helpful_in_situations', null=True)
@@ -46,7 +46,7 @@ class Situation(models.Model):
 class Thought(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     response = models.ForeignKey(Response, on_delete=models.CASCADE)
-    thought_text = models.CharField(max_length=200)
+    thought_text = models.CharField(max_length=256000)
     is_nat = models.BooleanField(default=False)
 
     def __str__(self):
