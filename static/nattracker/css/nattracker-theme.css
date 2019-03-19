@@ -11,6 +11,11 @@
 	border-color: #8981b0
 }
 
+.btn-primary:hover {
+	background-color: #53489a;
+	border-color: #53489a;
+}
+
 .navbar-dark a.navbar-brand {
 	font-family: 'Kalam', cursive;
 }
