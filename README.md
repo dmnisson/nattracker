@@ -10,6 +10,10 @@ As data are entered into the database, the user can see which thoughts of his or
 her "helpful" responses most effectively challenged his or her NATs, as well as
 which NATs occurred more frequently. This information appears on the "Statistics" page.
 
+Currently, a client is allowed to log in and see a "dashboard" overview of his
+most recent situations and responses. However, a function for admins to grant
+"observers" access to the data of specific clients will be implemented.
+
 This repository contains the directory for a single Django app which is intended
 to be installed and used within a larger Django project environment. The code
 runs on Python 3 and is tested on Django 2.0.2.
