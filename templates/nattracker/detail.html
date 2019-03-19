@@ -2,12 +2,42 @@
 
 {% block title %}Situation details -- {{ user.username }} -- nattracker{% endblock %}
 
-{% block heading %}Situation{% endblock %}
+{% block heading %}Situation Details{% endblock %}
 
 {% block content %}
 <div class="row">
-    <div class="col-lg-10">
+    <div class="col">
         <p class="text-muted">Added {{object.add_date}}</p>
         <p>{{ object.situation_text }}</p>
+        <p><a href="{% url 'edit_situation' object.id %}" class="btn btn-primary">Edit</a></p>
     </div>
 </div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Unhelpful response</h2>
+                {% if object.unhelpful_response %}
+                <p class="card-text">{{ object.unhelpful_response.response_name }}</p>
+                <a href="{% url 'response_detail' object.unhelpful_response.id %}" class="card-link">More details</a>
+                {% else %}
+                <p class="card-text">No unhelpful response entered.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Helpful response</h2>
+                {% if object.helpful_response %}
+                <p class="card-text">{{ object.helpful_response.response_name }}</p>
+                <a href="{% url 'response_detail' object.helpful_response.id %}" class="card-link">More details</a>
+                {% else %}
+                <p class="card-text">No helpful response entered.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

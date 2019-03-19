@@ -3,10 +3,10 @@
 {% load widget_tweaks statistics_extras %}
 
 {% block title %}
-{% if response.name|length == 0 %}
+{% if response.response_name|length == 0 %}
 New Response
 {% else %}
-Editing Response "{{ response.name }}"
+Editing Response "{{ response.response_name }}"
 {% endif %}
  -- {{ user.username }} -- nattracker
 {% endblock %}

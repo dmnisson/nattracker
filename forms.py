@@ -4,21 +4,25 @@ from .models import Situation, Response, Thought, Emotion, Behavior
 
 import datetime
 
-class SituationForm(forms.Form):
-    situation_desc = forms.CharField(label='Situation', max_length=255)
+class SituationForm(forms.ModelForm):
+    class Meta:
+        model = Situation
+        fields = ['situation_text', 'unhelpful_response', 'helpful_response']
+
+    situation_text = forms.CharField(label='Situation', max_length=255)
     unhelpful_response = forms.ModelChoiceField(label='Unhelpful Response', queryset=Response.objects.all())
     helpful_response = forms.ModelChoiceField(label='Helpful Response', queryset=Response.objects.all())
 
     def addNewSituation(self, user):
         situation = Situation(user=user,
             add_date=datetime.datetime.now(),
-            situation_text=self.cleaned_data['situation_desc'],
+            situation_text=self.cleaned_data['situation_text'],
             unhelpful_response=self.cleaned_data['unhelpful_response'],
             helpful_response=self.cleaned_data['helpful_response'])
         situation.save()
 
     def editSituation(self, situation):
-        situation.situation_text = self.cleaned_data['situation_desc']
+        situation.situation_text = self.cleaned_data['situation_text']
         situation.unhelpful_response = self.cleaned_data['unhelpful_response']
         situation.helpful_response = self.cleaned_data['helpful_response']
         situation.save()
@@ -71,10 +75,10 @@ class ResponseForm(forms.ModelForm):
         self.saveResponseWithThoughts(response, user)
 
     def editResponse(self, response):
-        response.response_name = self.cleaned_data['response_name'],
-        response.emotions.all().delete()
+        response.response_name = self.cleaned_data['response_name']
+        response.emotions.clear()
         response.emotions.add(*(self.cleaned_data['emotions']))
-        response.behaviors.all().delete()
+        response.behaviors.clear()
         response.behaviors.add(*(self.cleaned_data['behaviors']))
         self.saveResponseWithThoughts(response, response.user)
 

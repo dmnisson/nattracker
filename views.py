@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import TemplateView, View
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, UpdateView, DeleteView
 
 from django.core.paginator import Paginator
 
@@ -12,7 +12,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Situation, Response, Emotion, Behavior
 from django.utils import timezone
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.shortcuts import render, redirect
 
 from django.http import HttpResponse, JsonResponse
@@ -61,7 +61,7 @@ class ObjectOwnerMixin(object):
         if queryset is None:
             queryset = self.get_queryset()
 
-        pk = self.kwargs.get(self.pk_url_arg, None)
+        pk = self.kwargs.get('pk', None);
         queryset = queryset.filter(pk=pk, user=self.request.user)
 
         try:
@@ -78,16 +78,19 @@ class SituationView(LoginRequiredMixin, ObjectOwnerMixin, DetailView):
 
     model = Situation
 
+class ResponseView(LoginRequiredMixin, ObjectOwnerMixin, DetailView):
+    login_url = '/nattracker/users/login/'
 
-class SituationFormView(ABC, LoginRequiredMixin, ObjectOwnerMixin, FormView):
+    template_name = 'nattracker/response_details.html'
+
+    model = Response
+
+
+class SituationFormView(ABC, LoginRequiredMixin, ObjectOwnerMixin):
     login_url = '/nattracker/users/login/'
 
     template_name = 'nattracker/edit_situation.html'
     form_class = SituationForm
-
-    @abstractmethod
-    def form_valid(self, form):
-        return super().form_valid(form)
 
 class ResponseFormView(ABC, LoginRequiredMixin, ObjectOwnerMixin, TemplateView):
     login_url = '/nattracker/users/login/'
@@ -95,18 +98,20 @@ class ResponseFormView(ABC, LoginRequiredMixin, ObjectOwnerMixin, TemplateView):
     template_name = 'nattracker/edit_response.html'
 
     def get(self, request, *args, **kwargs):
-        form = ResponseForm(request.user)
-        context_data = self.get_context_data(**kwargs)
+        form = self.create_form(request, kwargs.get('pk', None), None)
+        success_path = kwargs.get('success_path', reverse('profile'))
+        context_data = self.get_context_data(success_path=success_path)
         context_data['form'] = form
         return render(request, self.template_name, context_data)
 
     def post(self, request, *args, **kwargs):
-        form = ResponseForm(user=request.user, data=request.POST or None)
+        form = self.create_form(request, kwargs.get('pk', None), request.POST or None)
+        success_path = kwargs.get('success_path', reverse('profile'))
         if (form.is_valid()):
             self.form_valid(form)
-            return redirect('add_situation')
+            return redirect('/' + success_path)
 
-        context_data = self.get_context_data(**kwargs)
+        context_data = self.get_context_data(success_path=success_path)
         context_data['form'] = form
         return render(request, self.template_name, context_data)
 
@@ -114,39 +119,37 @@ class ResponseFormView(ABC, LoginRequiredMixin, ObjectOwnerMixin, TemplateView):
     def form_valid(self, form):
         return form.is_valid()
 
-class AddSituationView(SituationFormView):
+    @abstractmethod
+    def create_form(self, request, pk, data):
+        return ResponseForm(request.user)
+
+class AddSituationView(SituationFormView, FormView):
     action_situation = 'add'
     success_url = '/nattracker/users/profile/'
 
     def form_valid(self, form):
         form.addNewSituation(self.request.user)
-        return super().form_valid(form)
+        return super(FormView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action_url'] = reverse('add_situation')
         return context
 
-class EditSituationView(SituationFormView):
+
+
+class EditSituationView(SituationFormView, UpdateView):
     action_situation = 'edit'
     success_url = '/nattracker/users/profile/'
-
-    def form_valid(self, form):
-        form.editSituation(super(SituationFormView, self).get_situation())
-        return super().form_valid(form)
-
-    def get_situation(self):
-        return Situation.objects.get(pk=self.kwargs['pk'])
+    model = Situation
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['situation'] = self.get_situation()
-        context['action_url'] = reverse('edit_situation', args=[self.get_situation().pk])
+        context['action_url'] = reverse('edit_situation', args=[self.object.pk])
         return context
 
 class AddResponseView(ResponseFormView):
     action_response = 'add'
-    success_url = '/nattracker/users/profile'
 
     def form_valid(self, form):
         form.addNewResponse(self.request.user)
@@ -154,24 +157,39 @@ class AddResponseView(ResponseFormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['action_url'] = reverse('add_response')
+        context['action_url'] = reverse('add_response', args=[kwargs['success_path']])
         return context
+
+    def create_form(self, request, pk, data):
+        return ResponseForm(request.user, data=data)
 
 class EditResponseView(ResponseFormView):
     action_response = 'edit'
-    success_url = '/nattracker/users/profile'
 
     def form_valid(self, form):
-        form.editResponse(super(EditResponseView, self).get_response())
+        form.editResponse(self.get_response())
         return super().form_valid(form)
 
     def get_response(self):
-        return Response.objects.get(pk=self.kwargs['pk'])
+        pk = self.kwargs['pk']
+        return Response.objects.get(pk=pk)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['action_url'] = reverse('edit_response', args=[self.get_response().pk])
+        context['response'] = self.get_response()
+        context['action_url'] = reverse('edit_response', args=[self.get_response().pk, kwargs['success_path']])
         return context
+
+    def create_form(self, request, pk, data):
+        return ResponseForm(request.user, data=data, instance=Response.objects.get(pk=pk))
+
+class DeleteResponseView(LoginRequiredMixin, ObjectOwnerMixin, DeleteView):
+    login_url = '/nattracker/users/login'
+
+    template_name = 'nattracker/delete_response.html'
+
+    model = Response
+    success_url = reverse_lazy('manage_responses')
 
 class StatisticsView(LoginRequiredMixin, TemplateView):
     login_url = '/nattracker/users/login'
@@ -184,13 +202,13 @@ class StatisticsView(LoginRequiredMixin, TemplateView):
         self.statistics.compute_for_user(self.request.user)
         context = super().get_context_data(**kwargs)
         context['user'] = self.request.user
-        context['most_frequent_negative_thoughts_list'] = map(lambda kv: kv[0], sorted(self.statistics.negative_thought_freq_dict.items(), key=lambda kv: kv[1], reverse=True))
-        context['thought_freq_dict'] = self.statistics.negative_thought_freq_dict
-        context['thought_emotion_dict'] = self.statistics.negative_thought_emotion_dict
-        context['thought_response_dict'] = self.statistics.negative_thought_response_dict
-        context['most_effective_positive_challenges_list'] = map(lambda kv: self.statistics.challenged_thought(kv[0]), sorted(self.statistics.thought_challenge_eff_dict.items(), key=lambda kv: kv[1], reverse=True))
+        context['most_frequent_negative_thoughts_list'] = list(map(lambda kv: kv[0], sorted(self.statistics.negative_thought_freq_dict.items(), key=lambda kv: kv[1], reverse=True)))
+        # display frequencies per day
+        context['thought_freq_dict'] = {thought:freq*86400 for thought, freq in self.statistics.negative_thought_freq_dict.items()}
+        context['most_effective_positive_challenges_list'] = list(map(lambda kv: kv[0], sorted(self.statistics.thought_challenge_dict.items(), key=lambda kv: self.statistics.thought_challenge_eff_dict[kv[0]][kv[1]], reverse=True)))
         context['thought_challenge_dict'] = self.statistics.thought_challenge_dict
-        context['thought_challenge_eff_dict'] = self.statistics.thought_challenge_eff_dict
+        # display efficacies as percentages
+        context['thought_challenge_eff_dict'] = {thought:{challenge:eff*100 for challenge, eff in eff_dict.items()} for thought, eff_dict in self.statistics.thought_challenge_eff_dict.items()}
 
         return context
 

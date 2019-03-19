@@ -46,7 +46,7 @@
                     </tr>
                     {% for response in latest_responses_list %}
                     <tr>
-                        <td><a href="#">{{ response.response_name }}</a></td>
+                        <td><a href="{% url 'response_detail' response.id %}">{{ response.response_name }}</a></td>
                         <td>{{ response_latest_occur_dict|get_item:response }}</td>
                     </tr>
                     {% endfor %}

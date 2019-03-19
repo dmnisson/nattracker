@@ -1,0 +1,47 @@
+{% extends "./user_base.html" %}
+
+{% block title %}Details of response "{{ object.response_name }}" -- {{ user.username }} -- nattracker{% endblock %}
+
+{% block heading %}
+<h1>{{ object.response_name }} <a href="{% url 'edit_response' object.id request.path %}" class="btn btn-primary">Edit</a></h1>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col">
+        <h2>Thoughts</h2>
+        <table class="table">
+            <tr>
+                <th>Description</th>
+                <th>Negative Automatic Thought?</th>
+            </tr>
+            {% for thought in response.thought_set.all %}
+            <tr>
+                <td>{{ thought.thought_text }}</td>
+                <td>{{ thought.is_nat|yesno:"Yes,No" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <h2>Emotions</h2>
+        <ul class="list-group">
+            {% for emotion in response.emotions.all %}
+            <li class="list-group-item">{{ emotion.emotion_name }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <h2>Behaviors</h2>
+        <ul class="list-group">
+            {% for behavior in response.behaviors.all %}
+            <li class="list-group-item">{{ behavior.behavior_text }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -1,9 +1,21 @@
 {% extends "./user_base.html" %}
 {% load widget_tweaks statistics_extras %}
 
-{% block title %}Editing Situation -- {{ user.username }} -- nattracker{% endblock %}
+{% block title %}
+{% if situation.situation_text|length == 0 %}
+New Situation
+{% else %}
+Editing Situation
+{% endif %}-- {{ user.username }} -- nattracker
+{% endblock %}
 
-{% block heading %}Update Situation{% endblock %}
+{% block heading %}
+{% if situation.situation_text|length == 0 %}
+Add New
+{% else %}
+Update
+{% endif %}Situation
+{% endblock %}
 
 {% block content %}
 <form action="{{ action_url }}" method="POST">
@@ -40,7 +52,7 @@
     {% endfor %}
 
     <div>
-        <a class="btn btn-primary my-2" href="{% url 'add_response' %}">Add new response</a>
+        <a class="btn btn-primary my-2" href="{% url 'add_response' request.path %}">Add new response</a>
     </div>
 
     <button type="submit" class="btn btn-success my-2">Save</button>

@@ -17,15 +17,15 @@
     <div class="col-lg-10">
 <table class="table">
     <tr>
-        <th>Thought</th> <th>Frequency</th> <th>Most Frequent Emotion</th>    <th>Most Frequent Response</th>
+        <th>Thought</th> <th>Frequency (per day)</th>
     </tr>
     {% if most_frequent_negative_thoughts_list|length > 0 %}
     {% for thought in most_frequent_negative_thoughts_list %}
     <tr>
+        {% with freq=thought_freq_dict|get_item:thought %}
         <td>{{ thought }}</td>
-        <td>{{ thought_freq_dict|get_item:thought }}</td>
-        <td>{{ thought_emotion_dict|get_item:thought }}</td>
-        <td>{{ thought_response_dict|get_item:thought }}</td>
+        <td>{{ freq|floatformat:1 }}</td>
+        {% endwith %}
     </tr>
     {% endfor %}
     {% else %}
@@ -47,15 +47,16 @@
     <div class="col-lg-10">
 <table class="table">
     <tr>
-        <th>Negative Thought</th>    <th>Negative Emotion</th>    <th>Positive Challenge</th> <th>Efficacy</th>
+        <th>Negative Thought</th>   <th>Positive Challenge</th> <th>Efficacy</th>
     </tr>
     {% if most_effective_positive_challenges_list|length > 0 %}
     {% for thought in most_effective_positive_challenges_list %}
     <tr>
         <td>{{ thought }}</td>
-        <td>{{ thought_emotion_dict|get_item:thought }}</td>
-        <td>{{ thought_challenge_dict|get_item:thought }}</td>
-        <td>{{ thought_challenge_eff_dict|get_item:thought }}</td>
+        {% with challenge=thought_challenge_dict|get_item:thought challenge_eff=thought_challenge_eff_dict|get_item:thought %}
+        <td>{{ challenge }}</td>
+        <td>{{ challenge_eff|get_item:challenge }}%</td>
+        {% endwith %}
     </tr>
     {% endfor %}
     {% else %}

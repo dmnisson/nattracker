@@ -1,0 +1,17 @@
+{% extends "./user_base.html" %}
+
+{% block title %}Comfirm Delete -- {{ user.username }} -- nattracker{% endblock %}
+
+{% block heading %}Confirm delete{% endblock %}
+
+{% block content %}
+<form method="POST">{% csrf_token %}
+    <div class="form-row">
+        <div class="col">
+            <p>Are you sure you want to delete response “{{ object.response_name }}”?</p>
+            <button type="submit" class="btn btn-primary">Yes</button>
+            <a href="{% url 'manage_responses' %}" class="btn btn-secondary">No</a>
+        </div>
+    </div>
+</form>
+{% endblock %}

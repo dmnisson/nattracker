@@ -21,9 +21,9 @@
                         <td>{{ response.response_name }}</td>
                         <td>
                             <div class="btn-group" role="group" aria-label="Response management actions">
-                                <a class="btn btn-primary" href="#">Details</a>
-                                <a class="btn btn-primary" href="#">Edit</a>
-                                <a class="btn btn-primary" href="#">Delete</a>
+                                <a class="btn btn-primary" href="{% url 'response_detail' response.id %}">Details</a>
+                                <a class="btn btn-primary" href="{% url 'edit_response' response.id %}">Edit</a>
+                                <a class="btn btn-primary" href="{% url 'delete_response' response.id %}">Delete</a>
                             </div>
                         </td>
                     </tr>
