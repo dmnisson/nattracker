@@ -109,7 +109,7 @@ class ResponseFormView(ABC, LoginRequiredMixin, ObjectOwnerMixin, TemplateView):
         success_path = kwargs.get('success_path', reverse('profile'))
         if (form.is_valid()):
             self.form_valid(form)
-            return redirect('/' + success_path)
+            return redirect('/' + success_path[1:] if success_path[0] == '/' else success_path)
 
         context_data = self.get_context_data(success_path=success_path)
         context_data['form'] = form

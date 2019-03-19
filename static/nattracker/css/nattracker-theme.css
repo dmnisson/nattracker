@@ -1,0 +1,20 @@
+.bg-dark {
+	background-color: #1d0f84!important
+}
+
+.bg-light {
+	background-color: #7accff!important
+}
+
+.btn-primary {
+	background-color: #8981b0;
+	border-color: #8981b0
+}
+
+.navbar-dark a.navbar-brand {
+	font-family: 'Kalam', cursive;
+}
+
+h1 {
+	font-family: 'Lato', Arial, Helvetica, sans-serif;
+}

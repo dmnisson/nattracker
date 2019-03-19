@@ -93,6 +93,16 @@ class StatisticsTests(TestCase):
         self.assertEqual(len(statistics.negative_thought_freq_dict), 0)
         self.assertEqual(len(statistics.thought_challenge_dict), 0)
         self.assertEqual(len(statistics.thought_challenge_eff_dict), 0)
+        
+    def test_no_situations(self):
+    	response1 = create_response(self.user.id, "Response 1", ["NAT1", "NAT2", "NAT3"], [], ["angry", "scared"], ["ran", "screamed"])
+    	response2 = create_response(self.user.id, "Response 2", [], ["PC1", "PC2", "PC3"], ["happy", "calm"], ["sat down", "breathed"])
+    	self.tmpLogIn()
+    	statistics = Statistics()
+    	statistics.compute_for_user(self.user)
+    	self.assertEqual(len(statistics.negative_thought_freq_dict), 3)
+    	self.assertEqual(len(statistics.thought_challenge_dict), 0)
+    	self.assertEqual(len(statistics.thought_challenge_eff_dict), 3)
 
     def test_single_past_situation_no_helpful_responses(self):
         situation = create_situation(self.user.id, "Situation", -1)

@@ -15,13 +15,17 @@ class Statistics:
 
     def thought_freq(self, thought, user):
         '''Compute user's frequency of a thought from addition dates of situations it occurs in.'''
-        earliest_add_date = Situation.objects.filter(user=user).order_by('add_date')[0].add_date
-        latest_add_date = Situation.objects.filter(user=user).order_by('-add_date')[0].add_date
-        duration = (latest_add_date - earliest_add_date).total_seconds()
-        if duration != 0:
-            return (thought.response.unhelpful_in_situations.count() + thought.response.helpful_in_situations.count()) / duration
+        situations = Situation.objects.filter(user=user)
+        if situations:
+        	earliest_add_date = Situation.objects.filter(user=user).order_by('add_date')[0].add_date
+        	latest_add_date = Situation.objects.filter(user=user).order_by('-add_date')[0].add_date
+        	duration = (latest_add_date - earliest_add_date).total_seconds()
+        	if duration != 0:
+        		return (thought.response.unhelpful_in_situations.count() + thought.response.helpful_in_situations.count()) / duration
+        	else:
+        		return float('NaN')
         else:
-            return float('NaN')
+        	return 0
 
     def thought_challenge_eff(self, thought, user):
         '''Estimate the efficacy of challenges to a given unhelpful thought'''
