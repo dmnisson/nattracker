@@ -1,5 +1,15 @@
 # nattracker
-A therapy tool allowing users to track their negative automatic thoughts and emotional responses. 
+A therapy tool allowing users to track their negative automatic thoughts and emotional responses.
 
-This is a work-in-progress. When complete, it will allow users to enter thoughts, emotions, and responses to situations
-and statistically analyze relationships between them, and this README will be updated accordingly.
+Clients enter situations with a "helpful response" and/or an "unhelpful response".
+Each "response" includes one or more thoughts, which may or may not be NATs
+(negative automatic thoughts), as well as emotions that were felt, and behavioral
+responses that occurred. Multiple situation entries may use the same response.
+
+As data are entered into the database, the user can see which thoughts of his or
+her "helpful" responses most effectively challenged his or her NATs, as well as
+which NATs occurred more frequently. This information appears on the "Statistics" page.
+
+This repository contains the directory for a single Django app which is intended
+to be installed and used within a larger Django project environment. The code
+runs on Python 3 and is tested on Django 2.0.2.
