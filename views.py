@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from django.db.models import Q
+
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
 from django.views.generic import ListView, DetailView
@@ -62,11 +64,12 @@ class ObjectOwnerMixin(object):
             queryset = self.get_queryset()
 
         pk = self.kwargs.get('pk', None);
-        queryset = queryset.filter(pk=pk, user=self.request.user)
+        queryset = queryset.filter(Q(user=self.request.user) | Q(user__allowed_subjects__exact=self.request.user), pk=pk)
 
         try:
             obj = queryset.get()
         except ObjectDoesNotExist:
+        	# check if user is allowed to observe the subject
             raise PermissionDenied
 
         return obj

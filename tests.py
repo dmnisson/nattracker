@@ -6,6 +6,9 @@ from django.urls import reverse
 from .models import User, Situation, Response, Thought, Behavior, Emotion
 
 from .domain import Statistics
+from .views import ObjectOwnerMixin
+
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
 import math
 
@@ -59,6 +62,34 @@ class ProfileViewTests(TestCase):
         self.assertContains(response, "No situations have been added.")
         self.assertQuerysetEqual(response.context['latest_situations_list'], [])
 
+class ObjectOwnerMixinTests(TestCase):
+	def setUp(self):
+		self.users = [(User.objects.create_user('tmpuser', 'tmpuser@example.com', 'tmppass'), 'tmppass'), 
+			(User.objects.create_user('tmpuser2', 'tmpuser2@example.com', 'tmppass2'), 'tmppass2'),
+			(User.objects.create_user('tmpuser3', 'tmpuser3@example.com', 'tmppass3'), 'tmppass3')]
+		self.users[2][0].allowed_subjects.add(self.users[0][0])
+		
+	def tmpLogIn(self, index):
+		print(self.client.login(username=self.users[index][0].username, password=self.users[index][1]))
+		
+	def test_object_owned(self):
+		owned_object = create_situation(self.users[0][0].id, "Test situation 0.", -1)
+		owned_object1 = create_situation(self.users[1][0].id, "Test situation 1.", -1)
+		self.tmpLogIn(0)
+		response = self.client.get(reverse('detail', args=(owned_object.id,)), follow=True)
+		self.assertContains(response, owned_object.situation_text)
+		response = self.client.get(reverse('detail', args=(owned_object1.id,)))
+		self.assertNotEquals(response.status_code, 200)
+		
+	def test_subject_allowed(self):
+		owned_object = create_situation(self.users[0][0].id, "Test situation 0.", -1)
+		owned_object1 = create_situation(self.users[1][0].id, "Test situation 1.", -1)
+		owned_object2 = create_situation(self.users[2][0].id, "Test situation 2.", -1)
+		self.tmpLogIn(2)
+		response = self.client.get(reverse('detail', args=(owned_object.id,)), follow=True)
+		self.assertContains(response, owned_object.situation_text)
+		response = self.client.get(reverse('detail', args=(owned_object1.id,)))
+		self.assertNotEquals(response.status_code, 200)
 
 class SituationViewTests(TestCase):
     def setUp(self):

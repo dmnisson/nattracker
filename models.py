@@ -6,9 +6,13 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 class User(AbstractUser):
     is_client = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
+
     allowed_subjects = models.ManyToManyField("self", blank=True)
     groups = models.ManyToManyField(Group, related_name="nattracker_groups")
     user_permissions = models.ManyToManyField(Permission, related_name="nattracker_permissions")
+
+    def __str__(self):
+        return self.email
 
 class Emotion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

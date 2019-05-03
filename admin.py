@@ -1,6 +1,8 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import UserChangeForm
 
-from .models import Situation, Response, Thought, Emotion, Behavior
+from .models import User, Situation, Response, Thought, Emotion, Behavior
 
 class SituationAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -26,6 +28,18 @@ class ResponseAdmin(admin.ModelAdmin):
     inlines = [ ThoughtInline, EmotionInline, BehaviorInline, ]
     exclude = ('emotions', 'behaviors',)
 
+class NattrackerUserChangeForm(UserChangeForm):
+	class Meta(UserChangeForm.Meta):
+		model = User
+
+class NattrackerUserAdmin(UserAdmin):
+	form = NattrackerUserChangeForm
+
+	fieldsets = UserAdmin.fieldsets + (
+		('User role information', {'fields': ('is_client', 'allowed_subjects')}),
+		)
+
+admin.site.register(User, NattrackerUserAdmin)
 admin.site.register(Response, ResponseAdmin)
 admin.site.register(Situation, SituationAdmin)
 admin.site.register(Emotion)
